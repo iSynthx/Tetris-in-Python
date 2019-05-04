@@ -1,5 +1,4 @@
 #Tetris v0.2
-#Simao Faria
 #Python 3
 
 import pygame, sys, random, time
