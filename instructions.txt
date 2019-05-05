@@ -1,0 +1,6 @@
+Instructions:
+
+Start the game to play.
+Press "SPACE" to rotate the tetramino (piece).
+Press the left and right arrow keys to slide the piece to the respective side.
+The game isn't finished so it's really buggy x)
