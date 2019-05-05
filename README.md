@@ -18,4 +18,4 @@ sudo pip3 install pygame
 
 # Troubleshooting (3):
 If the game doesn't work, try running the script provided in Linux:
-chmod 777 prepare.sh && sudo ./prepare.sh
+sudo chmod 777 prepare.sh && ./prepare.sh
