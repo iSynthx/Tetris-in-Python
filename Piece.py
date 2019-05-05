@@ -93,7 +93,7 @@ class Piece:
 	def overlaps2Pieces(self, b):
 		for aux1 in self.squarePositions:
 			for aux2 in b.squarePositions:
-				if (aux1[0] == aux2[0] and ((aux1[1]+50) >= aux2[1])):
+				if (aux1[0] == aux2[0] and ((aux1[1]+50) == aux2[1])):
 					return True
 		return False
 

@@ -2,7 +2,7 @@
 #Change as needed
 config = {
 	'screensize' : (800,600) , 
-	'timer_constant' : 800 ,
+	'timer_constant' : 100 ,
 	'bottom_line' : 550 , 
 }
 

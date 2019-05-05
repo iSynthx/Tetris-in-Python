@@ -1,4 +1,4 @@
-#Tetris v0.2
+#Tetris v0.3.1
 #João Lucas Pires
 
 import pygame, sys, random, time
@@ -22,7 +22,7 @@ class Tetris():
 		pygame.init()
 		pygame.event.set_blocked(pygame.MOUSEMOTION)
 		#Creates timer to control the frames
-		pygame.time.set_timer(pygame.USEREVENT+1, config['timer_constant'])
+		pygame.time.set_timer(pygame.USEREVENT+1, config["timer_constant"])
 		clock = pygame.time.Clock()
 		#Starts the game
 		piece = generatePiece()
@@ -57,7 +57,7 @@ class Tetris():
 			pygame.draw.lines(window, colors["GREEN"], False, [(0,550),(800,550)],4)
 			pygame.display.update()
 			#Ticks the timer (fps)
-			clock.tick(60)	
+			clock.tick(120)	
 
 #generatePiece(void)
 #Auxiliary function to construct the piece and display it on the top of the screen
@@ -71,10 +71,10 @@ def generatePiece():
 #clearScreen(void)
 #Auxiliary function to fill the screen with black
 def clearScreen():
-	window.fill((0,0,0))
+	window.fill(colors["BLACK"])
 	pygame.display.update()
 
-#debugFloorPieces()
+#debugFloorPieces(void)
 #Auxiliary function to debug the list of pieces
 def debugFloorPieces():
 	print("Pieces on the bottom: " + str(floorPieces))
