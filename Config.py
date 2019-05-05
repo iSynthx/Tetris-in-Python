@@ -3,15 +3,21 @@
 config = {
 	'screensize' : (800,600) , 
 	'timer_constant' : 100 ,
-	'bottom_line' : 550 , 
+	'bottom_line' : 600 , 
+
 }
+
+MOVE_VAL = 50
+LINE_COORDINATES = [(0,600),(800,600)]
 
 #Dictionary containing private configurations
 #Don't touch!
 privateConfig = {
 	'square_size' : 50 ,
 	'max_screen_right' : 650 ,
-	'max_screen_left' : 50
+	'max_screen_left' : 50 ,
+	'max_screen_top' : 0,
+	'max_screen_bottom' : 600
 }
 
 #Dictionary containing RGB tuples of some colorss
