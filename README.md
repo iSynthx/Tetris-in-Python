@@ -1,6 +1,9 @@
 # Tetris-in-Python
 
-Port of Tetris in python.
+Port of Tetris in Python.
+
+Refactored entire game in 26/02/2023.
+
 Still isn't finished so it doesn't work properly.
 
 ## Running steps:
