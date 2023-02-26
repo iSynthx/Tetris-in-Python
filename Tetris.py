@@ -4,11 +4,10 @@ from random import randint
 from typing import List, Optional
 
 import pygame
-from pygame import Surface, mixer, QUIT, KEYDOWN, K_ESCAPE, K_LEFT, K_s, K_RIGHT
-from pygame.threads import Thread
+from pygame import Surface, mixer, QUIT, KEYDOWN, K_ESCAPE, K_LEFT, K_s, K_RIGHT, Rect
 
 from Tetromino import Tetromino
-from globals import GAME_COLORS, SQUARE_SIZE, MUSIC_FILENAME, TETROMINO_COLORS, MAX_X_AXIS
+from globals import GAME_COLORS, SQUARE_SIZE, MUSIC_FILENAME, TETROMINO_COLORS, MAX_X_AXIS, MAX_Y_AXIS
 
 
 class Tetris:
@@ -17,11 +16,13 @@ class Tetris:
     :arg window (Window/Surface object of the game)
     :arg spawn_piece (Should a piece be spawned?)
     :arg pieces (Pieces currently in the game)
+    :arg can_move (Controls the event handler to stop the user from making invalid inputs)
     """
     window: Surface = None
     should_spawn_piece: bool = True
     pieces: List[Tetromino] = []
     current_piece: Optional[Tetromino] = None
+    can_move = True
 
     def __init__(self, window: Surface):
         self.window = window
@@ -42,8 +43,9 @@ class Tetris:
             self._draw_pieces()
             # if the current piece has hit the bottom => spawn new piece
             # OR the current piece has hit another piece => spawn new piece
-            if self.current_piece.on_bottom or self.check_ingame_pieces_collision():
+            if self.current_piece.check_bottom_collision() or self.check_ingame_pieces_collision():
                 self.should_spawn_piece = True
+                self._check_filled_lines()
             else:
                 # Drop the current piece
                 self._drop_current_piece()
@@ -51,27 +53,46 @@ class Tetris:
             time.sleep(1)
             # Disable last frame
             self._clear_window()
+            self.can_move_piece = True
 
     def check_ingame_pieces_collision(self):
         """
         Checks if the current piece is colliding with any of the drawn pieces on the window.
         """
+        collisions: List[Optional[bool]] = []
         # Obtain the current piece rects
-        current_piece_rects = self.current_piece.as_sprite()
+        current_piece_rects = self.current_piece.sprite
         # For each piece ingame
         for piece in self.pieces:
             # if it isnt the current playable piece...
             if piece != self.current_piece:
-                # TODO Improvement -> Dont recalculate sprites; Save them inside the obj.
                 # Get the current piece as rects
-                piece_rects = piece.as_sprite()
+                piece_rects = piece.sprite
                 # For rect in the current piece
                 for rect in piece_rects:
                     # for rect in current game piece rects
                     for current_rect in current_piece_rects:
-                        if current_rect.bottom == rect.top: # TODO Theres a bug here.
-                            return True
+                        collisions.append(self._check_rect_collision(current_rect, rect))
+        return any(collisions)
+
+    def _check_rect_collision(self, pivot_rect: Rect, other_rect: Rect):
+        """
+        Given two Rect objects, checks for collision between them.
+        :param pivot_rect: Current rect
+        :param other_rect: Target rect to evaluate against
+        :return: True if they collide.
+        """
+        if pivot_rect.bottom == other_rect.top:  # same Y
+            if pivot_rect.left == other_rect.left:  # Same X
+                return True
         return False
+
+    def _check_filled_lines(self):
+        """
+        Checks if there is any filled lines.
+        :return:
+        """
+        pass
 
     def _clear_window(self):
         """
@@ -91,6 +112,8 @@ class Tetris:
         Drops piece by a SQUARE_SIZE value.
         """
         piece.set_position(left=piece.left, top=piece.top + SQUARE_SIZE)
+        # Rebuild sprite
+        piece.build_sprite()
 
     def _spawn_piece(self):
         """
@@ -109,10 +132,8 @@ class Tetris:
         Given a Tetromino object, draw it on the pygame window.
         :arg piece Tetromino Object
         """
-        # Obtain list of rects
-        sprite = piece.as_sprite()
         # For every rect, draw it on the window with the piece color.
-        for rect in sprite:
+        for rect in piece.sprite:
             rect_kwargs = {
                 'surface': self.window,
                 'color': piece.color,
@@ -138,11 +159,12 @@ class Tetris:
             if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
                 sys.exit(0)
             elif event.type == KEYDOWN:
-                key = event.key
-                if key == K_LEFT:
-                    self.current_piece.move_left()
-                elif key == K_RIGHT:
-                    self.current_piece.move_right()
-                elif key == K_s:
-                    time.sleep(10)
-
+                if self.can_move_piece:
+                    key = event.key
+                    if key == K_LEFT:
+                        self.current_piece.move_left()
+                    elif key == K_RIGHT:
+                        self.current_piece.move_right()
+                    elif key == K_s:
+                        time.sleep(10)
+                    self.can_move_piece = False

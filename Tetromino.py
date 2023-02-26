@@ -80,29 +80,32 @@ class Tetromino:
     Initializes a random piece everytime.
     :arg fill_position Matrix with each square positions
     :arg color of the piece
-    :arg on_bottom if the piece has reached the bottom
     :arg left Pivot position of the piece
     :arg top Pivot position of the piece
     """
     fill_position: List[List[bool]] = [[False for _ in range(4)] for _ in range(4)]  # grid 4X4
     color: Tuple[int] = GAME_COLORS["WHITE"]  # white
-    on_bottom: bool = False
     left: int = 0
     top: int = 0
+    sprite: List[Rect] = []
 
     def __init__(self, **kwargs):
-        random_idx_piece = randint(0, len(AVAILABLE_TETROMINOS) - 1)
-        self.fill_position = AVAILABLE_TETROMINOS[random_idx_piece]
         if 'top' in kwargs:
             self.top = kwargs["top"]
         if 'left' in kwargs:
             self.left = kwargs["left"]
         if 'color' in kwargs:
             self.color = kwargs["color"]
+        # Choose random piece
+        random_idx_piece = randint(0, len(AVAILABLE_TETROMINOS) - 1)
+        # Save the piece fill matrix
+        self.fill_position = AVAILABLE_TETROMINOS[random_idx_piece]
+        # Generate the list of Rects (Sprite)
+        self.build_sprite()
         # TODO apply random transformation/reflection/rotation
         # TODO control appearence rates
 
-    def as_sprite(self) -> List[Rect]:
+    def build_sprite(self):
         """
         Returns a list of rect objects drawn on the correct positions,
         depending on the type of piece.
@@ -113,11 +116,10 @@ class Tetromino:
             for j, square in enumerate(row):
                 if square:
                     # Top Position + Height of the Square + (Height of the Square * Vertical Matrix Position )
-                    self._check_bottom_collision(self.top + SQUARE_SIZE + (SQUARE_SIZE * i))
                     rects.append(
                         Rect((self.left + (j * SQUARE_SIZE), self.top + (i * SQUARE_SIZE)), (SQUARE_SIZE, SQUARE_SIZE))
                     )
-        return rects
+        self.sprite = rects
 
     def set_position(self, top: int, left: int):
         """
@@ -135,27 +137,32 @@ class Tetromino:
         """
         if (self.left - SQUARE_SIZE) >= 0:
             self.left -= SQUARE_SIZE
+        # Rebuild sprite
+        self.build_sprite()
 
     def move_right(self):
         """
         Move the piece to the right.
         (Shifts one Square Size to the right.)
         """
-        rects = self.as_sprite()
         right_collide = False
-        for rect in rects:
+        for rect in self.sprite:
             if (rect.right + SQUARE_SIZE) > MAX_X_AXIS:
                 right_collide = True
         if not right_collide:
             self.left += SQUARE_SIZE
+            # Rebuild sprite
+            self.build_sprite()
 
-    def _check_bottom_collision(self, y_position: int):
+    def check_bottom_collision(self):
         """
-        Returns true if the provided position from the piece rect is on the bottom.
-        :param y_position: Calculated position of the rect.
+        Returns true if the piece is on the bottom.
+
         """
-        if not self.on_bottom and y_position == MAX_Y_AXIS:
-            self.on_bottom = True
+        for i, rect in enumerate(self.sprite):
+            if rect.bottom == MAX_Y_AXIS:
+                return True
+        return False
 
     def _debug_piece(self):
         """
